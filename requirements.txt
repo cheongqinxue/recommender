@@ -4,3 +4,4 @@ torchkge
 faiss
 pandas
 numpy
+s3fs
