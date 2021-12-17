@@ -5,3 +5,4 @@ faiss-cpu
 pandas
 numpy
 s3fs
+joblib
