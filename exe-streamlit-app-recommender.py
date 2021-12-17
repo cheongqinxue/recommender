@@ -7,15 +7,29 @@ import numpy as np
 import torch
 from bipartite_models import TransRBipartiteModel
 import requests
+import s3fs
+fs = s3fs.S3FileSystem(anon=False)
 
 class Args:
     datapath = 'streamlit'
     modelpath = 'models/transrBipartite-marginloss0_5-800epoch-5neg'
+        
+@st.cache(ttl=600)
+def load_joblib(path):
+    with fs.open(path) as f:
+        data = joblib.load(f)
+    return data
+
+@st.cache(ttl=600)
+def load_np(path):
+    with fs.open(path) as f:
+        data = np.load(f)
+    return data
 
 def load(path):
-    df = joblib.load(path+'/df.joblib')
+    df = load_joblib(path+'/df.joblib')
     df.published_date = pd.to_datetime(df.published_date, errors='coerce', unit='s')
-    emb = np.load(path+'/embeds.np.npy')
+    emb = load_np(path+'/embeds.np.npy')
     return df, emb
 
 def criteria(idx, col, fn):
