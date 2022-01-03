@@ -37,7 +37,7 @@ def model_fn(path):
     model, head2ix = TransRBipartiteModel.load_s3_pretrained(args.modelpath)
     return model, head2ix
 
-@st.cache(ttl=600)
+@st.cache(ttl=600, allow_output_mutation=True)
 def load_rep_vec(path):
     with fs.open(path+'/rep_vectors.pt') as f:
         rep_vectors = torch.load(f)
