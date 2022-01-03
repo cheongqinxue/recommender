@@ -11,8 +11,8 @@ import s3fs
 fs = s3fs.S3FileSystem(anon=False)
 
 class Args:
-    datapath = 'streamlit'
-    modelpath = 'models/transrBipartite-marginloss0_5-800epoch-5neg'
+    datapath = 's3://qx-poc-public/recommender/'
+    modelpath = 's3://qx-poc-public/recommender/transrBipartite-marginloss0_5-800epoch-5neg/'
         
 @st.cache(ttl=600)
 def load_joblib(path):
@@ -31,6 +31,11 @@ def load(path):
     df.published_date = pd.to_datetime(df.published_date, errors='coerce', unit='s')
     emb = load_np(path+'/embeds.np.npy')
     return df, emb
+
+@st.cache(ttl=600)
+def model_fn(path):
+    model, head2ix = TransRBipartiteModel.load_s3_pretrained(args.modelpath)
+    return model, head2ix
 
 def criteria(idx, col, fn):
     try:
@@ -104,7 +109,7 @@ def main(args):
     index.nprobe = 8
     print('Done! ')
     print('Loading recommender model...',end='')
-    model, head2ix = TransRBipartiteModel.load_pretrained(args.modelpath)
+    model, head2ix = model_fn(args.modelpath)
     rep_vectors = torch.load(args.modelpath+'/rep_vectors.pt')
     print('Done!')
 
