@@ -14,6 +14,8 @@ from torchkge.utils import init_embedding
 from torchkge.utils.operations import get_bernoulli_probs
 
 from tqdm import tqdm
+import s3fs
+fs = s3fs.S3FileSystem(anon=False)
 
 # Helpers =============================================
 
@@ -98,7 +100,12 @@ class BernoulliNegSampler:
         return neg_heads.long(), neg_tails.long()
 
 def readjson(path):
-    with codecs. open(path) as f:
+    with codecs.open(path) as f:
+        data = json.loads(f.read())
+    return data
+
+def readjsons3(path):
+    with fs.open(path) as f:
         data = json.loads(f.read())
     return data
 
@@ -134,6 +141,19 @@ class Bipartite_Model:
         head2ix = readjson(join('head2ix.json'))
         model = TransRBipartiteModel(**config)
         missing_unexpected_keys = model.load_state_dict(torch.load(join('model.pt')), strict=False)
+        print(missing_unexpected_keys)
+
+        return model, head2ix
+    
+    @classmethod
+    def load_s3_pretrained(self, path, modelname=None):
+        join = lambda x: path + '/' + x
+        folderpath = join(modelname) if not modelname is None else folderpath
+        config = readjsons3(join('config.json'))
+        head2ix = readjsons3(join('head2ix.json'))
+        model = TransRBipartiteModel(**config)
+        with fs.open(join('model.pt')) as f:
+            missing_unexpected_keys = model.load_state_dict(torch.load(f), strict=False)
         print(missing_unexpected_keys)
 
         return model, head2ix
