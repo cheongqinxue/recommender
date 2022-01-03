@@ -148,7 +148,7 @@ class Bipartite_Model:
     @classmethod
     def load_s3_pretrained(self, path, modelname=None):
         join = lambda x: path + '/' + x
-        folderpath = join(modelname) if not modelname is None else folderpath
+        path = join(modelname) if not modelname is None else path
         config = readjsons3(join('config.json'))
         head2ix = readjsons3(join('head2ix.json'))
         model = TransRBipartiteModel(**config)
