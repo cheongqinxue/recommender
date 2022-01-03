@@ -37,6 +37,12 @@ def model_fn(path):
     model, head2ix = TransRBipartiteModel.load_s3_pretrained(args.modelpath)
     return model, head2ix
 
+@st.cache(ttl=600)
+def load_rep_vec(path):
+    with fs.open(path+'/rep_vectors.pt') as f:
+        rep_vectors = torch.load(f)
+    return rep_vectors
+
 def criteria(idx, col, fn):
     try:
         x = ds[idx]
@@ -110,7 +116,7 @@ def main(args):
     print('Done! ')
     print('Loading recommender model...',end='')
     model, head2ix = model_fn(args.modelpath)
-    rep_vectors = torch.load(args.modelpath+'/rep_vectors.pt')
+    rep_vectors = load_rep_vec(args.modelpath)
     print('Done!')
 
     c1 = st.container()
