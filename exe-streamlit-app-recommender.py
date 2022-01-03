@@ -11,8 +11,8 @@ import s3fs
 fs = s3fs.S3FileSystem(anon=False)
 
 class Args:
-    datapath = 's3://qx-poc-public/recommender/'
-    modelpath = 's3://qx-poc-public/recommender/transrBipartite-marginloss0_5-800epoch-5neg/'
+    datapath = 's3://qx-poc-public/recommender'
+    modelpath = 's3://qx-poc-public/recommender/transrBipartite-marginloss0_5-800epoch-5neg'
         
 @st.cache(ttl=600)
 def load_joblib(path):
